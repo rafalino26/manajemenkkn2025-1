@@ -14,6 +14,23 @@ export const SharePopup = ({ url, onClose }: Props) => {
     alert('Link disalin!');
   };
 
+const handleDownload = async () => {
+  const response = await fetch(
+    `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=200x200`
+  );
+  const blob = await response.blob();
+  const downloadUrl = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = downloadUrl;
+  link.download = 'qrcode.png';
+  link.click();
+
+  // Optional: cleanup
+  URL.revokeObjectURL(downloadUrl);
+};
+
+
   return (
     <div className="fixed inset-0 bg-transparent backdrop-blur-sm z-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-xl shadow-xl relative w-[300px] text-center">
@@ -22,15 +39,13 @@ export const SharePopup = ({ url, onClose }: Props) => {
         </button>
 
         <QRCodeCanvas value={url} size={180} className="mx-auto" />
-        <p className="mt-2 text-sm break-all">{url}</p>
-        <a
-          href={`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(url)}&size=200x200`}
-          download="qrcode.png"
-          className="bg-red-600 text-white mt-3 inline-block py-1 px-4 rounded-md"
+        <p className="mt-2 text-sm text-black break-all">{url}</p>
+        <button
+        onClick={handleDownload}
+        className="bg-gray-200 text-black hover:bg-black hover:text-white mt-3 inline-block py-1 px-4 rounded-md transition-colors duration-200"
         >
-          Download
-        </a>
-
+        Download
+        </button>
         <div className="mt-4 flex flex-wrap justify-center gap-3 text-white">
           <a href={`https://www.facebook.com/sharer/sharer.php?u=${url}`} target="_blank" className="bg-blue-600 p-2 rounded-full">
             <FaFacebookF />
